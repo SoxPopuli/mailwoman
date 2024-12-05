@@ -1,8 +1,9 @@
 (lang dune 3.16)
+(using melange 0.1)
 
 (name frontend)
 
-(generate_opam_files true)
+(generate_opam_files false)
 
 (source
  (github username/reponame))
@@ -15,11 +16,20 @@
 
 (documentation https://url/to/documentation)
 
+(dialect
+ (name mlx)
+ (implementation
+  (extension mlx)
+  (merlin_reader mlx)
+  (preprocess
+   (run mlx-pp %{input-file}))))
+
 (package
  (name frontend)
  (synopsis "A short synopsis")
  (description "A longer description")
  (depends ocaml dune)
+ (allow_empty)
  (tags
   (topics "to describe" your project)))
 

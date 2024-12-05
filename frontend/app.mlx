@@ -1,0 +1,15 @@
+module Greeting = struct
+  let make ~name =
+    let message = Format.sprintf "Hello %s!" name in
+    <div>(React.string message)</div>
+  [@@react.component]
+  ;;
+end
+
+external get_element_by_id : string -> Dom.element = "getElementById"
+[@@mel.scope "document"]
+
+let () =
+  let root = get_element_by_id "app" |> ReactDOM.Client.createRoot in
+  ReactDOM.Client.render root <Greeting name = "bob" />
+;;
