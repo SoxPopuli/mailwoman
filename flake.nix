@@ -6,44 +6,65 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
-        formatter = pkgs.nixpkgs-fmt;
+  outputs = { self, nixpkgs, flake-utils }: flake-utils.lib.eachDefaultSystem (system: 
+  let
+    pkgs = nixpkgs.legacyPackages.${system};
 
-        devShells = {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              corepack_22
-            ];
+    ocaml-mlx = pkgs.ocamlPackages.buildDunePackage {
+      pname = "mlx";
+      version = "0.9";
+      duneVersion = "3";
 
-            nativeBuildInputs = with pkgs; [
-              pkg-config
-              gobject-introspection
-              cargo
-              cargo-tauri
-              nodejs
-            ];
+      src = builtins.fetchGit {
+        url = "https://github.com/ocaml-mlx/mlx";
+        ref = "refs/tags/0.9";
+        rev = "31bc70d5d7a7c67684209590086da466e1fff408";
+      };
 
-            buildInputs = with pkgs;[
-              at-spi2-atk
-              atkmm
-              cairo
-              gdk-pixbuf
-              glib
-              gtk3
-              harfbuzz
-              librsvg
-              libsoup_3
-              pango
-              webkitgtk_4_1
-              openssl
-            ];
-          };
-        };
+      buildInputs = with pkgs; [ 
+        ocamlPackages.ocaml-compiler-libs 
+        ocamlPackages.ppxlib
+      ];
+    };
+    ocaml-mlxmerlin = pkgs.ocamlPackages.buildDunePackage {
+      pname = "ocamlmerlin-mlx";
+      version = "0.9";
+      duneVersion = "3";
 
-      });
+      src = builtins.fetchGit {
+        url = "https://github.com/ocaml-mlx/mlx";
+        ref = "refs/tags/0.9";
+        rev = "31bc70d5d7a7c67684209590086da466e1fff408";
+      };
+
+      buildInputs = with pkgs; [ 
+        ocamlPackages.ocaml-compiler-libs 
+        ocamlPackages.ppxlib
+        ocamlPackages.merlin-lib
+      ];
+
+      nativeBuildInputs = with pkgs; [
+        ocamlPackages.cppo
+      ];
+    };
+
+  in
+  {
+    devShells = {
+      default = pkgs.mkShell {
+        packages = with pkgs; [
+          corepack_22
+          cargo
+          rust-analyzer
+          typescript-language-server
+
+          dune_3
+
+          ocamlPackages.melange
+          ocaml-mlx
+          ocaml-mlxmerlin
+        ];
+      };
+    };
+  });
 }
