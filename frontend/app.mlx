@@ -6,10 +6,49 @@ module Greeting = struct
   ;;
 end
 
+module Page = struct
+  type t =
+    | A
+    | B
+  [@@deriving jsConverter]
+
+  let to_string = function
+    | A -> "A"
+    | B -> "B"
+  ;;
+
+  let all = [ A; B ]
+end
+
+module TabBar = struct
+  let make ~buttons:_ = () [@@react.component]
+end
+
+module App = struct
+
+  type state = { page : Page.t }
+
+  let make () =
+    let state, setState = React.useState (fun () -> { page = Page.A }) in
+    <div>
+      <Greeting name="world" />
+      <button onClick=(fun _ -> setState (fun _ -> { page = Page.A }))>
+        (React.string "A")
+      </button>
+      <button onClick=(fun _ -> setState (fun _ -> { page = Page.B }))>
+        (React.string "B")
+      </button>
+      <p>(state.page |> Page.to_string |> React.string)</p>
+    </div>
+  [@@react.component]
+  ;;
+end
+
 external get_element_by_id : string -> Dom.element = "getElementById"
 [@@mel.scope "document"]
 
 let () =
   let root = get_element_by_id "app" |> ReactDOM.Client.createRoot in
-  ReactDOM.Client.render root <Greeting name = "bob" />
+  let app = <React.StrictMode><App /></React.StrictMode> in
+  ReactDOM.Client.render root app
 ;;

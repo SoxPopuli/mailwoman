@@ -2,5 +2,8 @@
   (target app)
   (libraries lib reason-react)
   (module_systems es6)
+  (runtime_deps
+    (glob_files ./static/*)
+   )
   (preprocess (pps melange.ppx reason-react-ppx))
 )
